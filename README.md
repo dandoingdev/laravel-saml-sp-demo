@@ -1,6 +1,6 @@
 # Laravel SAML SP Demo
 
-I've modernised the original codebase at taiyeoguns/laravel-saml-sp-demo to use Laravel 8 and aacotroneo/laravel-saml2 21.
+I've modernised the original codebase at taiyeoguns/laravel-saml-sp-demo to use Laravel 8.75 and aacotroneo/laravel-saml2 2.1.
 
 ## Overview
 
