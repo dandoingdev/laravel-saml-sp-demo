@@ -17,9 +17,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('login', [SAMLController::class, 'login']);
+Route::get('login', [SAMLController::class, 'login'])->name('login');
 Route::post('logout', [SAMLController::class, 'logout']);
-Route::group(['middleware' => ['samlauth']], function () {
+Route::group(['middleware' => ['auth']], function () {
     // protected routes go here
     Route::get('loggedin', [SAMLController::class, 'loggedin']);
 });
