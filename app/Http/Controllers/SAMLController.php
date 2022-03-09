@@ -6,7 +6,9 @@ class SAMLController extends Controller
 {
     public function login()
     {
-        return \Auth::guest() ? redirect('saml2/ssocircle1/login') : \Redirect::intended('/');
+        $idpNames = config('saml2_settings.idpNames');
+
+        return \Auth::guest() ? redirect(route('saml2_login', [$idpNames[0]])) : \Redirect::intended('/');
     }
 
     public function logout()
