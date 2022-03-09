@@ -19,7 +19,9 @@ class SAMLController extends Controller
         $returnTo = config('saml2_settings.logoutRoute');
 
         // pass parameters into the url
-        return redirect()->route('saml_logout', [
+        $idpNames = config('saml2_settings.idpNames');
+
+        return redirect()->route('saml2_logout', [$idpNames[0],
             'returnTo' => $returnTo,
             'nameId' => $nameId,
             'sessionIndex' => $sessionIndex,

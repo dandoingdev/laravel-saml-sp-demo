@@ -2,18 +2,26 @@
 
 return $settings = [
     /*
-     * If 'useRoutes' is set to true, the package defines five new routes:
+     * Array of IDP prefixes to be configured e.g. 'idpNames' => ['test1', 'test2', 'test3'],
+     * Separate routes will be automatically registered for each IDP specified with IDP name as prefix
+     * Separate config file saml2/<idpName>_idp_settings.php should be added & configured accordingly
+     */
+    'idpNames' => ['ssocircle1'],
+
+    /*
+     * If 'useRoutes' is set to true, the package defines five new routes for reach entry in idpNames:
      *
-     *    Method | URI                      | Name
-     *    -------|--------------------------|------------------
-     *    POST   | {routesPrefix}/acs       | saml_acs
-     *    GET    | {routesPrefix}/login     | saml_login
-     *    GET    | {routesPrefix}/logout    | saml_logout
-     *    GET    | {routesPrefix}/metadata  | saml_metadata
-     *    GET    | {routesPrefix}/sls       | saml_sls
+     *    Method | URI                                | Name
+     *    -------|------------------------------------|------------------
+     *    POST   | {routesPrefix}/{idpName}/acs       | saml_acs
+     *    GET    | {routesPrefix}/{idpName}/login     | saml_login
+     *    GET    | {routesPrefix}/{idpName}/logout    | saml_logout
+     *    GET    | {routesPrefix}/{idpName}/metadata  | saml_metadata
+     *    GET    | {routesPrefix}/{idpName}/sls       | saml_sls
      */
     'useRoutes' => true,
 
+    // Optional, leave empty if you want the defined routes to be top level, i.e. "/{idpName}/*"
     'routesPrefix' => '/saml2',
 
     /*
@@ -32,133 +40,23 @@ return $settings = [
     'logoutRoute' => '/',
 
     // Where to redirect after login if no other option was provided
-    'loginRoute' => '/loggedin',
+    'loginRoute' => '/',
 
     // Where to redirect after login if no other option was provided
-    'errorRoute' => '/error',
+    'errorRoute' => '/',
 
-    // One Login Settings
+    // If 'proxyVars' is True, then the Saml lib will trust proxy headers
+    // e.g X-Forwarded-Proto / HTTP_X_FORWARDED_PROTO. This is useful if
+    // your application is running behind a load balancer which terminates
+    // SSL.
+    'proxyVars' => false,
 
-    // If 'strict' is True, then the PHP Toolkit will reject unsigned
-    // or unencrypted messages if it expects them signed or encrypted
-    // Also will reject the messages if not strictly follow the SAML
-    // standard: Destination, NameId, Conditions ... are validated too.
-    'strict' => false, // @todo: make this depend on laravel config
-
-    // Enable debug mode (to print errors)
-    'debug' => true, // @todo: make this depend on laravel config
-
-    // Service Provider Data that we are deploying
-    'sp' => [
-        // Specifies constraints on the name identifier to be used to
-        // represent the requested subject.
-        // Take a look on lib/Saml2/Constants.php to see the NameIdFormat supported
-        'NameIDFormat' => 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
-
-        // Usually x509cert and privateKey of the SP are provided by files placed at
-        // the certs folder. But we can also provide them with the following parameters
-        'x509cert' => '',
-        'privateKey' => '',
-
-        // Identifier (URI) of the SP entity.
-        // Leave blank to use the 'saml_metadata' route.
-        'entityId' => '',
-
-        // Specifies info about where and how the <AuthnResponse> message MUST be
-        // returned to the requester, in this case our SP.
-        'assertionConsumerService' => [
-            // URL Location where the <Response> from the IdP will be returned,
-            // using HTTP-POST binding.
-            // Leave blank to use the 'saml_acs' route
-            'url' => '',
-        ],
-        // Specifies info about where and how the <Logout Response> message MUST be
-        // returned to the requester, in this case our SP.
-        'singleLogoutService' => [
-            // URL Location where the <Response> from the IdP will be returned,
-            // using HTTP-Redirect binding.
-            // Leave blank to use the 'saml_sls' route
-            'url' => '',
-        ],
-    ],
-    'idpNames' => ['ssocircle'],
-
-    // Security settings
-    'security' => [
-        // signatures and encryptions offered
-
-        // Indicates that the nameID of the <samlp:logoutRequest> sent by this SP
-        // will be encrypted.
-        'nameIdEncrypted' => false,
-
-        // Indicates whether the <samlp:AuthnRequest> messages sent by this SP
-        // will be signed.              [The Metadata of the SP will offer this info]
-        'authnRequestsSigned' => false,
-
-        // Indicates whether the <samlp:logoutRequest> messages sent by this SP
-        // will be signed.
-        'logoutRequestSigned' => false,
-
-        // Indicates whether the <samlp:logoutResponse> messages sent by this SP
-        // will be signed.
-        'logoutResponseSigned' => false,
-
-        /* Sign the Metadata
-         False || True (use sp certs) || array (
-                                                    keyFileName => 'metadata.key',
-                                                    certFileName => 'metadata.crt'
-                                                )
-        */
-        'signMetadata' => false,
-
-        // signatures and encryptions required
-
-        // Indicates a requirement for the <samlp:Response>, <samlp:LogoutRequest> and
-        // <samlp:LogoutResponse> elements received by this SP to be signed.
-        'wantMessagesSigned' => false,
-
-        // Indicates a requirement for the <saml:Assertion> elements received by
-        // this SP to be signed.        [The Metadata of the SP will offer this info]
-        'wantAssertionsSigned' => false,
-
-        // Indicates a requirement for the NameID received by
-        // this SP to be encrypted.
-        'wantNameIdEncrypted' => false,
-
-        // Authentication context.
-        // Set to false and no AuthContext will be sent in the AuthNRequest,
-        // Set true or don't present thi parameter and you will get an AuthContext 'exact' 'urn:oasis:names:tc:SAML:2.0:ac:classes:PasswordProtectedTransport'
-        // Set an array with the possible auth context values: array ('urn:oasis:names:tc:SAML:2.0:ac:classes:Password', 'urn:oasis:names:tc:SAML:2.0:ac:classes:X509'),
-        'requestedAuthnContext' => true,
-    ],
-
-    // Contact information template, it is recommended to suply a technical and support contacts
-    'contactPerson' => [
-        'technical' => [
-            'givenName' => 'name',
-            'emailAddress' => 'no@reply.com',
-        ],
-        'support' => [
-            'givenName' => 'Support',
-            'emailAddress' => 'no@reply.com',
-        ],
-    ],
-
-    // Organization information template, the info in en_US lang is recomended, add more if required
-    'organization' => [
-        'en-US' => [
-            'name' => 'Name',
-            'displayname' => 'Display Name',
-            'url' => 'http://url',
-        ],
-    ],
-
-    /* Interoperable SAML 2.0 Web Browser SSO Profile [saml2int]   http://saml2int.org/profile/current
-
-   'authnRequestsSigned' => false,    // SP SHOULD NOT sign the <samlp:AuthnRequest>,
-                                      // MUST NOT assume that the IdP validates the sign
-   'wantAssertionsSigned' => true,
-   'wantAssertionsEncrypted' => true, // MUST be enabled if SSL/HTTPs is disabled
-   'wantNameIdEncrypted' => false,
-*/
+    /*
+     * (Optional) Which class implements the route functions.
+     * If commented out, defaults to this lib's controller (Aacotroneo\Saml2\Http\Controllers\Saml2Controller).
+     * If you need to extend Saml2Controller (e.g. to override the `login()` function to pass
+     * a `$returnTo` argument), this value allows you to pass your own controller, and have
+     * it used in the routes definition.
+     */
+    // 'saml2_controller' => '',
 ];
